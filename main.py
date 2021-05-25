@@ -17,6 +17,8 @@ screen = pygame.display.set_mode((800, 800))
 pygame.display.set_caption("Snake")
 fps = pygame.time.Clock()
 game_over = False
+
+
 # icon = pygame.image.load('way.png')
 # pygame.display.set_icon(icon)
 
@@ -37,12 +39,13 @@ class Prioritize:
 snakeLocation = [(40, 40), (41, 40), (42, 40)]
 lastSnakeNode = (0, 0)
 snakeDir = 0
-#1=left
-#2=right
-#3=up
-#4=down
+# 1=left
+# 2=right
+# 3=up
+# 4=down
 global appleLocationX
 global appleLocationY
+
 
 class GridObj(object):
     def __init__(self):
@@ -50,7 +53,7 @@ class GridObj(object):
         self.grid = [0 for i in range(self.cols)]
         self.row = 80
         self.grass = (25, 255, 102)
-        self.apple = (255, 255, 0)  #yellow
+        self.apple = (255, 255, 0)  # yellow
         self.snakeBody = (255, 0, 0)
         self.snakeHead = (179, 0, 0)
         self.green = (0, 255, 0)
@@ -68,9 +71,6 @@ class GridObj(object):
         for i in range(self.cols):
             for j in range(self.row):
                 self.grid[i][j] = SearchBlock((i, j), None, 0, 1)
-
-        for i in range(self.cols):
-            for j in range(self.row):
                 self.grid[i][j].show(self, self.grass, 0)
 
         for i in range(0, self.row):
@@ -84,95 +84,103 @@ class GridObj(object):
             self.grid[i][self.row - 1].obs = True
 
     def clearNodes(self):
-        for i in range(self.cols):
-            for j in range(self.row):
+        for i in range(1, self.cols - 1):
+            for j in range(1, self.row - 1):
                 self.grid[i][j] = SearchBlock((i, j), None, 0, 1)
+                # self.grid[i][j].show(self, self.grass, 0)
 
-    def moveLeft(self, grid):
+    def moveLeft(self):
         if len(snakeLocation) > 1:
             if ((snakeLocation[0][0]) - 1) != (snakeLocation[1][0]):
                 # if (snakeLocation[0][0] - 1, snakeLocation[0][1]) not in snakeLocation:
                 if self.grid[snakeLocation[0][0] - 1][snakeLocation[0][1]].obs is False:
-
-                    if snakeLocation[0][0] - 1 == appleLocationX and snakeLocation[0][1] == appleLocationY:
+                    tail = snakeLocation.pop()
+                    head = snakeLocation[0]
+                    snakeLocation.insert(0, (head[0] - 1, head[1]))
+                    if head[0] - 1 == appleLocationX and head[1] == appleLocationY:
                         self.clearNodes()
+                        snakeLocation.append((tail[0], tail[1]))
+                        updateSnake(self)
                         addApple(self)
                     else:
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].cost = 1
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].show(grid, grid.grass, 0)
-                        del snakeLocation[-1]
-
-                    snakeLocation.insert(snakeLocation[0][0] - 1, snakeLocation[0][1])
-                    grid.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(grid, grid.snakeHead, 0)
-                    grid.grid[snakeLocation[1][0]][snakeLocation[1][1]].show(grid, grid.snakeBody, 0)
-                    grid.grid[snakeLocation[1][0]][snakeLocation[1][1]].cost = maxsize
-
+                        self.grid[tail[0]][tail[1]].cost = 1
+                        self.grid[tail[0]][tail[1]].show(self, self.grass, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(self, self.snakeHead, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].cost = 1
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].show(self, self.snakeBody, 0)
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].cost = maxsize
 
                     global snakeDir
                     snakeDir = 1
 
-    def moveRight(self, grid):
+    def moveRight(self):
         if len(snakeLocation) > 1:
             if ((snakeLocation[0][0]) + 1) != (snakeLocation[1][0]):
                 # if(snakeLocation[0][0] + 1, snakeLocation[0][1]) not in snakeLocation:
                 if self.grid[snakeLocation[0][0] + 1][snakeLocation[0][1]].obs is False:
-
-                    if snakeLocation[0][0] + 1 == appleLocationX and snakeLocation[0][1] == appleLocationY:
+                    tail = snakeLocation.pop()
+                    head = snakeLocation[0]
+                    snakeLocation.insert(0, (head[0] + 1, head[1]))
+                    if head[0] + 1 == appleLocationX and head[1] == appleLocationY:
                         self.clearNodes()
+                        snakeLocation.append((tail[0], tail[1]))
+                        updateSnake(self)
                         addApple(self)
                     else:
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].cost = 1
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].show(grid, grid.grass, 0)
-                        del snakeLocation[-1]
-
-                    snakeLocation.insert(snakeLocation[0][0] + 1, snakeLocation[0][1])
-                    grid.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(grid, grid.snakeHead, 0)
-                    grid.grid[snakeLocation[1][1]][snakeLocation[1][1]].show(grid, grid.snakeBody, 0)
-                    grid.grid[snakeLocation[1][1]][snakeLocation[1][1]].cost = maxsize
+                        self.grid[tail[0]][tail[1]].cost = 1
+                        self.grid[tail[0]][tail[1]].show(self, self.grass, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(self, self.snakeHead, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].cost = 1
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].show(self, self.snakeBody, 0)
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].cost = maxsize
 
                     global snakeDir
                     snakeDir = 2
 
-    def moveUp(self, grid):
+    def moveUp(self):
         if len(snakeLocation) > 1:
             if ((snakeLocation[0][1]) - 1) != (snakeLocation[1][1]):
                 # if (snakeLocation[0][1] - 1, snakeLocation[0][0]) not in snakeLocation:
                 if self.grid[snakeLocation[0][0]][snakeLocation[0][1] - 1].obs is False:
-
-                    if snakeLocation[0][0] == appleLocationX and snakeLocation[0][1] - 1 == appleLocationY:
+                    tail = snakeLocation.pop()
+                    head = snakeLocation[0]
+                    snakeLocation.insert(0, (head[0], head[1] - 1))
+                    if head[0] == appleLocationX and head[1] - 1 == appleLocationY:
                         self.clearNodes()
+                        snakeLocation.append((tail[0], tail[1]))
+                        updateSnake(self)
                         addApple(self)
                     else:
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].cost = 1
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].show(grid, grid.grass, 0)
-                        del snakeLocation[-1]
-
-                    snakeLocation.insert(snakeLocation[0][0], snakeLocation[0][1] - 1)
-                    grid.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(grid, grid.snakeHead, 0)
-                    grid.grid[snakeLocation[1][0]][snakeLocation[1][1]].show(grid, grid.snakeBody, 0)
-                    grid.grid[snakeLocation[1][0]][snakeLocation[1][1]].cost = maxsize
+                        self.grid[tail[0]][tail[1]].cost = 1
+                        self.grid[tail[0]][tail[1]].show(self, self.grass, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(self, self.snakeHead, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].cost = 1
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].show(self, self.snakeBody, 0)
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].cost = maxsize
 
                     global snakeDir
                     snakeDir = 3
 
-    def moveDown(self, grid):
+    def moveDown(self):
         if len(snakeLocation) > 1:
             if ((snakeLocation[0][1]) + 1) != (snakeLocation[1][1]):
                 # if (snakeLocation[0][1] + 1, snakeLocation[0][0]) not in snakeLocation:
                 if self.grid[snakeLocation[0][0]][snakeLocation[0][1] + 1].obs is False:
-
-                    if snakeLocation[0][0] == appleLocationX and snakeLocation[0][1] + 1 == appleLocationY:
+                    tail = snakeLocation.pop()
+                    head = snakeLocation[0]
+                    snakeLocation.insert(0, (head[0], head[1] + 1))
+                    if head[0] == appleLocationX and head[1] + 1 == appleLocationY:
                         self.clearNodes()
+                        snakeLocation.append((tail[0], tail[1]))
+                        updateSnake(self)
                         addApple(self)
                     else:
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].cost = 1
-                        grid.grid[snakeLocation[-1][0]][snakeLocation[-1][1]].show(grid, grid.grass, 0)
-                        del snakeLocation[-1]
-
-                    snakeLocation.insert(snakeLocation[0][0], snakeLocation[0][1] + 1)
-                    grid.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(grid, grid.snakeHead, 0)
-                    grid.grid[snakeLocation[1][0]][snakeLocation[1][1]].show(grid, grid.snakeBody, 0)
-                    grid.grid[snakeLocation[1][0]][snakeLocation[1][1]].cost = maxsize
+                        self.grid[tail[0]][tail[1]].cost = 1
+                        self.grid[tail[0]][tail[1]].show(self, self.grass, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].show(self, self.snakeHead, 0)
+                        self.grid[snakeLocation[0][0]][snakeLocation[0][1]].cost = 1
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].show(self, self.snakeBody, 0)
+                        self.grid[snakeLocation[1][0]][snakeLocation[1][1]].cost = maxsize
 
                     global snakeDir
                     snakeDir = 4
@@ -200,34 +208,33 @@ class SearchBlock(object):
         pygame.draw.rect(screen, color, (self.i * grid.width, self.j * grid.height, grid.width, grid.height), st)
         pygame.display.update()
 
-    def addNeighbors(self, grid):
+    def addNeighbors(self, grid, location):
         i = self.i
         j = self.j
         # if i < self.cols - 1 and grid[self.i + 1][j].obs is False and (self.i + 1, j) != snakeLocation[1]:
-        if i < self.cols - 1 and grid[self.i + 1][j].obs is False and (self.i + 1, j) not in snakeLocation:
+        if i < self.cols - 1 and grid[self.i + 1][j].obs is False and (self.i + 1, j) not in location:
             self.neighbors.append(grid[self.i + 1][j])
             if grid[self.i + 1][j].parent is None:
                 grid[self.i + 1][j].cost = self.cost + 1
                 grid[self.i + 1][j].parent = self
         # if i > 0 and grid[self.i - 1][j].obs is False and (self.i - 1, j) != snakeLocation[1]:
-        if i > 0 and grid[self.i - 1][j].obs is False and (self.i - 1, j) not in snakeLocation:
+        if i > 0 and grid[self.i - 1][j].obs is False and (self.i - 1, j) not in location:
             self.neighbors.append(grid[self.i - 1][j])
             if grid[self.i - 1][j].parent is None:
                 grid[self.i - 1][j].cost = self.cost + 1
                 grid[self.i - 1][j].parent = self
         # if j < self.row - 1 and grid[self.i][j + 1].obs is False and (self.i, j + 1) != snakeLocation[1]:
-        if j < self.row - 1 and grid[self.i][j + 1].obs is False and (self.i, j + 1) not in snakeLocation:
+        if j < self.row - 1 and grid[self.i][j + 1].obs is False and (self.i, j + 1) not in location:
             self.neighbors.append(grid[self.i][j + 1])
             if grid[self.i][j + 1].parent is None:
                 grid[self.i][j + 1].cost = self.cost + 1
                 grid[self.i][j + 1].parent = self
         # if j > 0 and grid[self.i][j - 1].obs is False and (self.i, j - 1) != snakeLocation[1]:
-        if j > 0 and grid[self.i][j - 1].obs is False and (self.i, j - 1) not in snakeLocation:
+        if j > 0 and grid[self.i][j - 1].obs is False and (self.i, j - 1) not in location:
             self.neighbors.append(grid[self.i][j - 1])
             if grid[self.i][j - 1].parent is None:
                 grid[self.i][j - 1].cost = self.cost + 1
                 grid[self.i][j - 1].parent = self
-
 
 
 # initial score
@@ -251,18 +258,14 @@ def show_score(choice, color, font, size):
     screen.blit(score_surface, score_rect)
 
 
-
-
-
 def addApple(grid):
     t = random.randint(1, 79)
     w = random.randint(1, 79)
     appleDest = grid.grid[t][w]
     okSpawn = True
     if not appleDest.obs:
-        for loc in range(0, len(snakeLocation)):
-            if snakeLocation[loc][0] == t and snakeLocation[loc][1] == w:
-                okSpawn = False
+        if (t, w) in snakeLocation:
+            okSpawn = False
         if okSpawn:
             global appleLocationX
             appleLocationX = t
@@ -304,8 +307,13 @@ class PathFinder:
                 cls.nodesExpanded += len(explored)
                 return state
 
+            snakeLocationCopy = list(snakeLocation)
+            if state.coord not in snakeLocationCopy:
+                snakeLocationCopy.pop()
+                snakeLocationCopy.insert(0, state.coord)
+
             explored.add(state.coord)
-            state.addNeighbors(grid.grid)
+            state.addNeighbors(grid.grid, snakeLocationCopy)
             neighbors = state.neighbors
             for iter in range(len(neighbors)):
                 neighbor = neighbors[iter]
@@ -323,7 +331,6 @@ class PathFinder:
         d = math.sqrt((n.i - e.i) ** 2 + (n.j - e.j) ** 2)
         # d = abs(n.i - e.i) + abs(n.j - e.j)
         return d
-
 
 
 def clearOldSnakeLocation(grid):
@@ -345,9 +352,10 @@ def gameLoop(grid):
     game_over = False
     pathFinder = PathFinder()
     iniTime = time.process_time()
-    while not game_over:  #create game mode options
+    while not game_over:  # create game mode options
         if appleLocationX != 0 and appleLocationY != 0 and snakeDir != 0:
-            state = pathFinder.A_star_search(grid, grid.grid[snakeLocation[0][0]][snakeLocation[0][1]], grid.grid[appleLocationX][appleLocationY])
+            state = pathFinder.A_star_search(grid, grid.grid[snakeLocation[0][0]][snakeLocation[0][1]],
+                                             grid.grid[appleLocationX][appleLocationY])
             finalState = state
             nextNode = (0, 0)
             while state.parent.coord != snakeLocation[0]:
@@ -357,14 +365,15 @@ def gameLoop(grid):
                 nextNode = state.coord
 
             move = (nextNode[0] - snakeLocation[0][0], nextNode[1] - snakeLocation[0][1])
+            print(snakeLocation)
             if move == (0, -1):
-                grid.moveUp(grid)
+                grid.moveUp()
             elif move == (0, 1):
-                grid.moveDown(grid)
+                grid.moveDown()
             elif move == (-1, 0):
-                grid.moveLeft(grid)
+                grid.moveLeft()
             elif move == (1, 0):
-                grid.moveRight(grid)
+                grid.moveRight()
 
         # if time.process_time() - iniTime >= 0.2:
         #     if snakeDir == 1:
@@ -384,26 +393,26 @@ def gameLoop(grid):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     if snakeDir != 1:
-                        grid.moveLeft(grid)
+                        grid.moveLeft()
                         iniTime = time.process_time()
                 elif event.key == pygame.K_RIGHT:
                     if snakeDir != 2:
-                        grid.moveRight(grid)
+                        grid.moveRight()
                         iniTime = time.process_time()
                 elif event.key == pygame.K_UP:
                     if snakeDir != 3:
-                        grid.moveUp(grid)
+                        grid.moveUp()
                         iniTime = time.process_time()
                 elif event.key == pygame.K_DOWN:
                     if snakeDir != 4:
-                        grid.moveDown(grid)
+                        grid.moveDown()
                         iniTime = time.process_time()
 
 
 def main():
     playGround = GridObj()
     playGround.createPlayGround()
-    #show_score((0, 0, 0), 'Helvetica', 20)
+    # show_score((0, 0, 0), 'Helvetica', 20)
     updateSnake(playGround)
     addApple(playGround)
     gameLoop(playGround)
